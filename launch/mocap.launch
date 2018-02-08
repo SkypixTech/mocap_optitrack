@@ -1,15 +1,22 @@
-<launch>
+<?xml version="1.0"?>
 
+<launch>
+  <arg name="quad_name" default="star"/>
   <!-- Pass in mocap_config_file:=/path/to/config.yaml to change options. -->
   <arg name="mocap_config_file"
        default="$(find mocap_optitrack)/config/mocap.yaml" />
-
+  <!--
+  <env name="ROSCONSOLE_CONFIG_FILE"
+       value="$(find mocap_optitrack)/custom_rosconsole.conf"/>
+  -->
   <node pkg="mocap_optitrack"
         type="mocap_node"
         name="mocap_node"
         respawn="false"
         launch-prefix=""
-        required="true">
+        required="true"
+        output="screen" >
     <rosparam file="$(arg mocap_config_file)" command="load" />
+    <remap from="Robot_1/pose" to="/optitrack/$(arg quad_name)"/>
   </node>
 </launch>

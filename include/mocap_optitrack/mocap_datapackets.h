@@ -44,116 +44,124 @@
 #include <iostream>
 #include <string>
 #include <geometry_msgs/PoseStamped.h>
+#include <visualization_msgs/Marker.h>
+#include <geometry_msgs/PointStamped.h>
+
 
 using namespace std;
 
 /// \brief Data object holding the position of a single mocap marker in 3d space
 class Marker
 {
-  public:
-    float positionX;
-    float positionY;
-    float positionZ;
+public:
+  float positionX;
+  float positionY;
+  float positionZ;
 };
 
 class Pose
 {
-  public:
-    struct {
-      float x;
-      float y;
-      float z;
-    } position;
-    struct {
-      float x;
-      float y;
-      float z;
-      float w;
-    } orientation;
+public:
+  struct {
+    float x;
+    float y;
+    float z;
+  } position;
+  struct {
+    float x;
+    float y;
+    float z;
+    float w;
+  } orientation;
 };
 
 /// \brief Data object holding information about a single rigid body within a mocap skeleton
 class RigidBody
 {
-  public:
-    RigidBody();
-    ~RigidBody();
+public:
+  RigidBody();
+  ~RigidBody();
 
-    int ID;
-    
-    Pose pose; 
+  int ID;
 
-    int NumberOfMarkers;
-    Marker *marker;
+  Pose pose;
 
-    const geometry_msgs::PoseStamped get_ros_pose();
-    bool has_data();
+  int NumberOfMarkers;
+  Marker *marker;
+
+  const geometry_msgs::PoseStamped get_ros_pose();
+  const geometry_msgs::PointStamped get_marker_1_pos();
+  const geometry_msgs::PointStamped get_marker_2_pos();
+  const geometry_msgs::PointStamped get_marker_3_pos();
+  const geometry_msgs::PointStamped get_marker_4_pos();
+
+  bool has_data();
 };
 
 /// \brief Data object describing a single tracked model
 class ModelDescription
 {
-  public:
-    ModelDescription();
-    ~ModelDescription();
+public:
+  ModelDescription();
+  ~ModelDescription();
 
-    string name;
-    int numMarkers;
-    string *markerNames;
+  string name;
+  int numMarkers;
+  string *markerNames;
 };
 
 class MarkerSet
 {
-  public:
-    MarkerSet() : numMarkers(0), markers(0) {}
-    ~MarkerSet() { delete[] markers; }
-    char name[256];
-    int numMarkers;
-    Marker *markers;
+public:
+  MarkerSet() : numMarkers(0), markers(0) {}
+  ~MarkerSet() { delete[] markers; }
+  char name[256];
+  int numMarkers;
+  Marker *markers;
 };
 
 /// \brief Data object holding poses of a tracked model's components
 class ModelFrame
 {
-  public:
-    ModelFrame();
-    ~ModelFrame();
+public:
+  ModelFrame();
+  ~ModelFrame();
 
-    MarkerSet *markerSets;
-    Marker *otherMarkers;
-    RigidBody *rigidBodies;
+  MarkerSet *markerSets;
+  Marker *otherMarkers;
+  RigidBody *rigidBodies;
 
-    int numMarkerSets;
-    int numOtherMarkers;
-    int numRigidBodies;
+  int numMarkerSets;
+  int numOtherMarkers;
+  int numRigidBodies;
 
-    float latency;
+  float latency;
 };
 
 /// \brief Parser for a NatNet data frame packet
 class MoCapDataFormat
 {
-  public:
-    MoCapDataFormat(const char *packet, unsigned short length);
-    ~MoCapDataFormat();
+public:
+  MoCapDataFormat(const char *packet, unsigned short length);
+  ~MoCapDataFormat();
 
-    /// \brief Parses a NatNet data frame packet as it is streamed by the Arena software according to the descriptions in the NatNet SDK v1.4
-    void parse ();
+  /// \brief Parses a NatNet data frame packet as it is streamed by the Arena software according to the descriptions in the NatNet SDK v1.4
+  void parse ();
 
 
-    const char *packet;
-    unsigned short length;
+  const char *packet;
+  unsigned short length;
 
-    int frameNumber;
-    ModelFrame model;
+  int frameNumber;
+  ModelFrame model;
 
-  private:
-    void seek(size_t count);
-    template <typename T> void read_and_seek(T& target)
-    {
-        target = *((T*) packet);
-        seek(sizeof(T));
-    }
+private:
+  void seek(size_t count);
+  template <typename T> void read_and_seek(T& target)
+  {
+    target = *((T*) packet);
+    seek(sizeof(T));
+  }
 };
 
 #endif  /*__MOCAP_DATAPACKETS_H__*/

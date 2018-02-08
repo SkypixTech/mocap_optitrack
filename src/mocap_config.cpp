@@ -8,16 +8,16 @@
  *   \ \_/ \_/ /  | |  | |  | ++ | |_| || ++ / | ++_/| |_| |  | |  | +-+ |
  *    \  \_/  /   | |_ | |_ | ++ |  _  || |\ \ | |   |  _  |  | |  | +-+ |
  *     \_____/    \___/|___||___||_| |_||_| \_\|_|   |_| |_|  |_|  |_| |_|
- *             ROBOTICS™ 
+ *             ROBOTICS™
  *
  *  File: mocap_config.cpp
  *  Desc: Classes representing ROS configuration for mocap_optitrack node. Data
  *  will be published to differed topics based on the configuration provided.
  *  Auth: Alex Bencz
  *
- *  Copyright (c) 2012, Clearpath Robotics, Inc. 
+ *  Copyright (c) 2012, Clearpath Robotics, Inc.
  *  All Rights Reserved
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -28,7 +28,7 @@
  *     * Neither the name of Clearpath Robotics, Inc. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -39,8 +39,8 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
- * Please send comments, questions, or patches to skynet@clearpathrobotics.com 
+ *
+ * Please send comments, questions, or patches to skynet@clearpathrobotics.com
  *
  */
 #include <geometry_msgs/PoseStamped.h>
@@ -59,13 +59,17 @@ PublishedRigidBody::PublishedRigidBody(XmlRpc::XmlRpcValue &config_node)
   publish_pose = validateParam(config_node, POSE_TOPIC_PARAM_NAME);
   publish_pose2d = validateParam(config_node, POSE2D_TOPIC_PARAM_NAME);
   // only publish tf if a frame ID is provided
-  publish_tf = (validateParam(config_node, CHILD_FRAME_ID_PARAM_NAME) && 
-               validateParam(config_node, PARENT_FRAME_ID_PARAM_NAME));
+  publish_tf = (validateParam(config_node, CHILD_FRAME_ID_PARAM_NAME) &&
+                validateParam(config_node, PARENT_FRAME_ID_PARAM_NAME));
 
   if (publish_pose)
   {
     pose_topic = (std::string&) config_node[POSE_TOPIC_PARAM_NAME];
     pose_pub = n.advertise<geometry_msgs::PoseStamped>(pose_topic, 1000);
+    marker_1_pos_pub = n.advertise<geometry_msgs::PointStamped>("marker_1_pose", 1000);
+    marker_2_pos_pub = n.advertise<geometry_msgs::PointStamped>("marker_2_pose", 1000);
+    marker_3_pos_pub = n.advertise<geometry_msgs::PointStamped>("marker_3_pose", 1000);
+    marker_4_pos_pub = n.advertise<geometry_msgs::PointStamped>("marker_4_pose", 1000);
   }
 
   if (publish_pose2d)
@@ -94,13 +98,39 @@ void PublishedRigidBody::publish(RigidBody &body)
     return;
   }
 
+
   // TODO Below was const, see if there a way to keep it like that.
   geometry_msgs::PoseStamped pose = body.get_ros_pose();
+
+  geometry_msgs::PointStamped pos_1 = body.get_marker_1_pos();
+  geometry_msgs::PointStamped pos_2 = body.get_marker_2_pos();
+  geometry_msgs::PointStamped pos_3 = body.get_marker_3_pos();
+  geometry_msgs::PointStamped pos_4 = body.get_marker_4_pos();
+
 
   if (publish_pose)
   {
     pose.header.frame_id = parent_frame_id;
     pose_pub.publish(pose);
+
+    marker_1_pos_pub.publish(pos_1);
+    marker_2_pos_pub.publish(pos_2);
+    marker_3_pos_pub.publish(pos_3);
+    marker_4_pos_pub.publish(pos_4);
+
+
+    //    ROS_INFO("---------------publishing pose---------------------");
+    //    ROS_INFO("inteagle: position of rigid body: [%f , %f, %f] \n",
+    //             pose.pose.position.x,
+    //             pose.pose.position.y,
+    //             pose.pose.position.z);
+
+
+    //    ROS_INFO("inteagle: orientation of rigid body: [%f , %f, %f, %f] \n",
+    //             pose.pose.orientation.x,
+    //             pose.pose.orientation.y,
+    //             pose.pose.orientation.z,
+    //             pose.pose.orientation.w);
   }
 
   if (!publish_pose2d && !publish_tf)

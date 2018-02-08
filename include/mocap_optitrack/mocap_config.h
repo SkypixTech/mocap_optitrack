@@ -8,16 +8,16 @@
  *   \ \_/ \_/ /  | |  | |  | ++ | |_| || ++ / | ++_/| |_| |  | |  | +-+ |
  *    \  \_/  /   | |_ | |_ | ++ |  _  || |\ \ | |   |  _  |  | |  | +-+ |
  *     \_____/    \___/|___||___||_| |_||_| \_\|_|   |_| |_|  |_|  |_| |_|
- *             ROBOTICS™ 
+ *             ROBOTICS™
  *
  *  File: mocap_config.h
  *  Desc: Classes representing ROS configuration for mocap_optitrack node. Data
  *  will be published to differed topics based on the configuration provided.
  *  Auth: Alex Bencz
  *
- *  Copyright (c) 2012, Clearpath Robotics, Inc. 
+ *  Copyright (c) 2012, Clearpath Robotics, Inc.
  *  All Rights Reserved
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -28,7 +28,7 @@
  *     * Neither the name of Clearpath Robotics, Inc. nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -39,8 +39,8 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
- * Please send comments, questions, or patches to skynet@clearpathrobotics.com 
+ *
+ * Please send comments, questions, or patches to skynet@clearpathrobotics.com
  *
  */
 
@@ -53,7 +53,7 @@
 
 class PublishedRigidBody
 {
-  private:
+private:
   ros::NodeHandle n;
 
   std::string pose_topic;
@@ -68,11 +68,15 @@ class PublishedRigidBody
 
   tf::TransformBroadcaster tf_pub;
   ros::Publisher pose_pub;
+  ros::Publisher marker_1_pos_pub;
+  ros::Publisher marker_2_pos_pub;
+  ros::Publisher marker_3_pos_pub;
+  ros::Publisher marker_4_pos_pub;
   ros::Publisher pose2d_pub;
 
   bool validateParam(XmlRpc::XmlRpcValue &, const std::string &);
 
-  public:
+public:
   PublishedRigidBody(XmlRpc::XmlRpcValue &);
   void publish(RigidBody &);
 };
